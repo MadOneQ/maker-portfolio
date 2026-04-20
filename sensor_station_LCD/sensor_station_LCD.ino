@@ -7,6 +7,7 @@
 #define TRIG_PIN 4
 #define ECHO_PIN 5
 #define LDR_PIN A0
+#define PIN_PIR 3
 
 // OBJECTS
 LiquidCrystal lcd(7,8,9,10,11,12);
@@ -34,6 +35,7 @@ void setup() {
   Serial.begin(9600);
   dht.begin();
   lcd.begin(16,2);  // 16 columns, 2 rows
+  pinMode(PIN_PIR, INPUT);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
 }
@@ -55,7 +57,11 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("Dist: " + String(dist, 1) + "cm ");
     lcd.setCursor(0, 1);
-    lcd.print("Light: " + String(light) + " ");
+    if(digitalRead(PIN_PIR) == HIGH) {
+    lcd.print("Motion!    ");
+    } else {
+      lcd.print("No motion    ");
+    }
   }
 
 screenMode = (screenMode + 1) % 2;  // Toggle between 0 and 1
@@ -70,6 +76,8 @@ screenMode = (screenMode + 1) % 2;  // Toggle between 0 and 1
     Serial.print(dist);
     Serial.print(",\"light\":");
     Serial.print(light);
+    Serial.print(",\"motion\":");
+    Serial.print(digitalRead(PIN_PIR) == HIGH ? 1 : 0);
     Serial.println("}");
 
     delay(2000);
